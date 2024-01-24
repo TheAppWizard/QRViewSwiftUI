@@ -49,13 +49,13 @@ struct QRView: View {
             Circle()
                 .foregroundStyle(.blue.opacity(0.2))
                 .offset(x: -200,y: 400)
-
+            
             VStack {
                 HStack {
                     Text("QR \nGenerator")
                         .foregroundStyle(.white)
                         .fontWeight(.regular)
-                    .font(. system(size: 72))
+                        .font(. system(size: 72))
                     Spacer()
                 }.padding(15)
                 
@@ -67,29 +67,33 @@ struct QRView: View {
                         .background(Color.white.opacity(0.1))
                         .cornerRadius(8)
                         .foregroundStyle(.white)
-
+                    
                     Spacer()
-
-                
+                    
+                    
                     generateQRCodeButton()
                 }.padding(20)
                 Spacer()
                 if let qrCodeImageURL = qrCodeImageURL {
-                    generateQRCodeImage(url: qrCodeImageURL)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 300, height: 300)
-                        .clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/))
+                    AsyncImage(url: qrCodeImageURL) { image in
+                        image
+                            .resizable()
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 300, height: 300)
+                    .clipShape(RoundedRectangle(cornerRadius: 25.0))
                 } else {
                     Text("QR Code Will Appear Here")
                         .foregroundColor(.white)
                 }
                 Spacer()
             }
-        
+            
         }
     }
-
+    
     func generateQRCodeButton() -> some View {
         Button(action: {
             if let encodedText = searchText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
@@ -107,7 +111,7 @@ struct QRView: View {
                 .cornerRadius(8)
         }
     }
-
+    
     func generateQRCodeImage(url: URL) -> Image {
         guard let imageData = try? Data(contentsOf: url),
               let uiImage = UIImage(data: imageData),
